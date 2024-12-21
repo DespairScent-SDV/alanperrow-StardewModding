@@ -402,113 +402,84 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(nameof(InventoryMenu.rightClick))]
         public static IEnumerable<CodeInstruction> RightClick_Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator ilg)
         {
-            MethodInfo isTakeAllButOneHotkeyDownMethod = AccessTools.DeclaredMethod(typeof(InventoryMenuPatches), nameof(InventoryMenuPatches.IsTakeAllButOneHotkeyDown));
             MethodInfo takeAllButOneItemMethod = AccessTools.DeclaredMethod(typeof(InventoryMenuPatches), nameof(InventoryMenuPatches.TakeAllButOneItem));
             MethodInfo takeAllButOneItemWithAddToMethod = AccessTools.DeclaredMethod(typeof(InventoryMenuPatches), nameof(InventoryMenuPatches.TakeAllButOneItemWithAddTo));
 
             List<CodeInstruction> instructionsList = instructions.ToList();
             bool flag = false, flag2 = false;
-            int patch2MinIndex = int.MaxValue;
+
+            Label? labelWithAddTo = null;
+            bool processingWithAddTo = false;
 
             for (int i = 0; i < instructionsList.Count; i++)
             {
-                // ==== First case: No item in cursor slot ====
-                // Find instruction for `if (this.actualInventory[slotNumber].Stack > 1 && Game1.isOneOfTheseKeysDown( ... { LeftShift })`
-                // IL_014d (instructionsList[?])
-                if (i > 0 && i < instructionsList.Count - 2
-                    && instructionsList[i - 1].opcode == OpCodes.Stloc_S && (instructionsList[i - 1].operand as LocalBuilder)?.LocalIndex == 4
-                    && instructionsList[i].opcode == OpCodes.Ldarg_0
-                    && instructionsList[i + 1].opcode == OpCodes.Ldfld
-                    && instructionsList[i + 2].opcode == OpCodes.Ldloc_1)
+                // Find instruction for `if (toAddTo == null)`
+                // IL_00bc (instructionsList[?])
+                if (instructionsList[i].opcode == OpCodes.Brtrue && instructionsList[i - 1].opcode == OpCodes.Ldarg_3)
                 {
-                    // Original source code checks for LeftShift in an if-statement. We want to prefix this with our own if-check for "Take All But One" feature.
-                    // By tracking the original instruction label, we can convert the original if-statement into an else condition of our own if-statement.
-                    Label labelIf = ilg.DefineLabel();
-
-                    // Find instruction for `if (this.actualInventory[slotNumber] != null && this.actualInventory[slotNumber].Stack <= 0)`
-                    // IL_0213 (instructionsList[?])
-                    Label labelEndElse = ilg.DefineLabel();
-                    int j = i + 4;
-                    for (; j < instructionsList.Count - 1; j++)
-                    {
-                        if (instructionsList[j - 2].opcode == OpCodes.Sub
-                            && instructionsList[j - 1].opcode == OpCodes.Callvirt
-                            && instructionsList[j].opcode == OpCodes.Ldarg_0
-                            && instructionsList[j + 1].opcode == OpCodes.Ldfld)
-                        {
-                            break;
-                        }
-                    }
-
-                    // Inject "Take All But One" code.
-                    yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load `this` InventoryMenu instance (arg0)
-                    yield return new CodeInstruction(OpCodes.Ldloc_1);                                          // load `num` int (local var @ index 1)
-                    yield return new CodeInstruction(OpCodes.Call, isTakeAllButOneHotkeyDownMethod)             // call helper method `IsTakeAllButOneHotkeyDown(this, num)`
-                    {
-                        labels = instructionsList[i].ExtractLabels()
-                    };
-                    yield return new CodeInstruction(OpCodes.Brfalse, labelIf);                                 // break to original if-statement if call => false
-
-                    yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load `this` InventoryMenu instance (arg0)
-                    yield return new CodeInstruction(OpCodes.Ldloc_1);                                          // load `num` int (local var @ index 1)
-                    yield return new CodeInstruction(OpCodes.Ldloc_S, 4);                                       // load `one` Item instance (local var @ short index 4)
-                    yield return new CodeInstruction(OpCodes.Call, takeAllButOneItemMethod);                    // call helper method `TakeAllButOneItem(this, num, one)`
-                    yield return new CodeInstruction(OpCodes.Br, labelEndElse);                                 // break to end of else block
-
-                    instructionsList[i].WithLabels(labelIf);
-                    instructionsList[j].WithLabels(labelEndElse);
-
-                    flag = true;
-                    patch2MinIndex = j + 2;
+                    labelWithAddTo = (Label)instructionsList[i].operand;
                 }
 
-                // ==== Second case: Has item in cursor slot ====
-                // Find instruction in `else` block for `if (Game1.isOneOfTheseKeysDown( ... { LeftShift })`
-                // IL_028c (instructionsList[?])
-                if (i > patch2MinIndex && i < instructionsList.Count - 2
-                    && instructionsList[i - 1].opcode == OpCodes.Bge
-                    && instructionsList[i].opcode == OpCodes.Ldsfld // valuetype StardewValley.Game1::oldKBState
-                    && instructionsList[i + 1].opcode == OpCodes.Ldc_I4_1
-                    && instructionsList[i + 2].opcode == OpCodes.Newarr)
+                if (labelWithAddTo.HasValue && instructionsList[i].labels.Contains(labelWithAddTo.Value))
                 {
-                    // Original source code checks for LeftShift in an if-statement. We want to prefix this with our own if-check for "Take All But One" feature.
-                    // By tracking the original instruction label, we can convert the original if-statement into an else condition of our own if-statement.
-                    Label labelIf = ilg.DefineLabel();
+                    labelWithAddTo = null;
+                    processingWithAddTo = true;
+                }
 
-                    // Find instruction for `if (playSound)`
-                    // IL_0343 (instructionsList[?])
-                    Label labelEndElse = ilg.DefineLabel();
-                    int j = i + 4;
-                    for (; j < instructionsList.Count - 1; j++)
+                // ==== First case: No item in cursor slot ====
+                if (labelWithAddTo.HasValue)
+                {
+                    // Find instruction for `one.set_Stack()`
+                    // IL_013e (instructionsList[?])
+                    if (!flag && instructionsList[i - 1].opcode == OpCodes.Callvirt && instructionsList[i - 1].operand == AccessTools.PropertySetter(typeof(Item), nameof(Item.Stack)))
                     {
-                        if (instructionsList[j - 2].opcode == OpCodes.Sub
-                            && instructionsList[j - 1].opcode == OpCodes.Callvirt // instance void StardewValley.Item::set_Stack(int32)
-                            && instructionsList[j].opcode == OpCodes.Ldarg_S
-                            && instructionsList[j + 1].opcode == OpCodes.Brfalse_S)
+                        flag = true;
+
+                        // Overwriting the previous `Count` assignment
+                        yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load `this` InventoryMenu instance (arg0)
+                        yield return new CodeInstruction(OpCodes.Ldloc_1);                                          // load `num` int (local var @ index 1)
+                        yield return new CodeInstruction(OpCodes.Ldloc_S, 5);                                       // load `one` Item instance (local var @ short index 5)
+                        yield return new CodeInstruction(OpCodes.Call, takeAllButOneItemMethod);                    // call helper method `TakeAllButOneItem(this, num, one)`
+                    }
+                }
+                // ==== Second case: Has item in cursor slot ====
+                else if (processingWithAddTo)
+                {
+                    // Find instruction for `if (Game1.isOneOfTheseKeysDown( ... { LeftShift })`
+                    // IL_019c (instructionsList[?])
+                    if (!flag2 && i < instructionsList.Count - 2
+                        && instructionsList[i - 1].opcode == OpCodes.Bge
+                        && instructionsList[i].opcode == OpCodes.Ldsfld // valuetype StardewValley.Game1::oldKBState
+                        && instructionsList[i + 1].opcode == OpCodes.Ldc_I4_1
+                        && instructionsList[i + 2].opcode == OpCodes.Newarr)
+                    {
+                        Label? labelEndElse = null;
+                        int j = i + 4;
+                        // Find instruction for `if (playSound)`
+                        // IL_0238 (instructionsList[?])
+                        for (; j < instructionsList.Count - 1; j++)
                         {
-                            break;
+                            if (instructionsList[j - 2].opcode == OpCodes.Callvirt // StardewValley.Item::ConsumeStack(int32)
+                                && instructionsList[j - 1].opcode == OpCodes.Callvirt // IList<StardewValley.Item>::set_Item(int32, StardewValley.Item)
+                                && instructionsList[j].opcode == OpCodes.Ldarg_S && Convert.ToInt32(instructionsList[j].operand) == 4 // playSound
+                                && instructionsList[j + 1].opcode == OpCodes.Brfalse_S)
+                            {
+                                labelEndElse = ilg.DefineLabel();
+                                instructionsList[j].WithLabels(labelEndElse.Value);
+                                break;
+                            }
+                        }
+                        if (labelEndElse.HasValue)
+                        {
+                            flag2 = true;
+
+                            yield return new CodeInstruction(OpCodes.Ldarg_0);                                      // load `this` InventoryMenu instance (arg0)
+                            yield return new CodeInstruction(OpCodes.Ldloc_1);                                      // load `num` int (local var @ index 1)
+                            yield return new CodeInstruction(OpCodes.Ldarg_3);                                      // load `toAddTo` Item instance (arg3)
+                            yield return new CodeInstruction(OpCodes.Call, takeAllButOneItemWithAddToMethod);       // call helper method `TakeAllButOneItemWithAddTo(this, num, toAddTo)`
+                            yield return new CodeInstruction(OpCodes.Brtrue, labelEndElse);                         // break to end of else block if call => true
                         }
                     }
-
-                    // Inject "Take All But One" code.
-                    yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load `this` InventoryMenu instance (arg0)
-                    yield return new CodeInstruction(OpCodes.Ldloc_1);                                          // load `num` int (local var @ index 1)
-                    yield return new CodeInstruction(OpCodes.Call, isTakeAllButOneHotkeyDownMethod)             // call helper method `IsTakeAllButOneHotkeyDown(this, num)`
-                    {
-                        labels = instructionsList[i].ExtractLabels()
-                    };
-                    yield return new CodeInstruction(OpCodes.Brfalse, labelIf);                                 // break to original if-statement if call => false
-
-                    yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load `this` InventoryMenu instance (arg0)
-                    yield return new CodeInstruction(OpCodes.Ldloc_1);                                          // load `num` int (local var @ index 1)
-                    yield return new CodeInstruction(OpCodes.Ldarg_3);                                          // load `toAddTo` Item instance (arg3)
-                    yield return new CodeInstruction(OpCodes.Call, takeAllButOneItemWithAddToMethod);           // call helper method `TakeAllButOneItemWithAddTo(this, num, toAddTo)`
-                    yield return new CodeInstruction(OpCodes.Br, labelEndElse);                                 // break to end of else block
-
-                    instructionsList[i].WithLabels(labelIf);
-                    instructionsList[j].WithLabels(labelEndElse);
-
-                    flag2 = true;
                 }
 
                 yield return instructionsList[i];
@@ -536,7 +507,7 @@ namespace ConvenientInventory.Patches
         public static bool IsTakeAllButOneHotkeyDown(InventoryMenu inventoryMenu, int slotNumber)
         {
             bool moreThanOneItem = inventoryMenu.actualInventory[slotNumber].Stack > 1; // Game logic
-
+        
             return ModEntry.Config.IsEnableTakeAllButOne
                 && moreThanOneItem
                 && (ModEntry.Config.TakeAllButOneKeyboardHotkey.IsDown() || ModEntry.Config.TakeAllButOneControllerHotkey.IsDown());
@@ -544,15 +515,22 @@ namespace ConvenientInventory.Patches
 
         public static void TakeAllButOneItem(InventoryMenu inventoryMenu, int slotNumber, Item newItem)
         {
-            newItem.Stack = inventoryMenu.actualInventory[slotNumber].Stack - 1;
-            inventoryMenu.actualInventory[slotNumber].Stack = 1;
+            if (IsTakeAllButOneHotkeyDown(inventoryMenu, slotNumber))
+            {
+                newItem.Stack = inventoryMenu.actualInventory[slotNumber].Stack - 1;
+            }
         }
 
-        public static void TakeAllButOneItemWithAddTo(InventoryMenu inventoryMenu, int slotNumber, Item toAddTo)
+        public static bool TakeAllButOneItemWithAddTo(InventoryMenu inventoryMenu, int slotNumber, Item toAddTo)
         {
-            int amountToTake = Math.Min(inventoryMenu.actualInventory[slotNumber].Stack - 1, toAddTo.getRemainingStackSpace());
-            inventoryMenu.actualInventory[slotNumber].Stack -= amountToTake;
-            toAddTo.Stack += amountToTake;
+            if (IsTakeAllButOneHotkeyDown(inventoryMenu, slotNumber))
+            {
+                int amountToTake = Math.Min(inventoryMenu.actualInventory[slotNumber].Stack - 1, toAddTo.getRemainingStackSpace());
+                inventoryMenu.actualInventory[slotNumber].Stack -= amountToTake;
+                toAddTo.Stack += amountToTake;
+                return true;
+            }
+            return false;
         }
     }
 
