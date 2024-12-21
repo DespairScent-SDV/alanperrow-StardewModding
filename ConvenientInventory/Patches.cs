@@ -522,8 +522,8 @@ namespace ConvenientInventory.Patches
             }
             else if (!flag || !flag2)
             {
-                string ordSuccess = !flag ? "First" : "Second";
-                string ordFail = !flag ? "Second" : "First";
+                string ordSuccess = flag ? "First" : "Second";
+                string ordFail = flag ? "Second" : "First";
                 ModEntry.Instance.Monitor.Log(
                     $"{nameof(InventoryMenuPatches)}.{nameof(RightClick_Transpiler)}: {ordSuccess} patch was applied successfully. "
                     + $"{ordFail} patch could not find target instruction(s) in {nameof(InventoryMenu.rightClick)}, so no changes were made.",
