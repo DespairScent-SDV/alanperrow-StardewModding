@@ -1373,7 +1373,7 @@ namespace ConvenientInventory.Patches
 
             try
             {
-                if (item.Stack == 0)
+                if (item != null && item.Stack == 0)
                 {
                     // We donated all the items in our held item stack, so cleanup leftover favorite item slots.
                     ConvenientInventory.UnfavoriteEmptyItemSlots();
