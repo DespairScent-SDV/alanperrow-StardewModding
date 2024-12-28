@@ -1,38 +1,54 @@
 {
-// Traduit par Fs_echo7
-
+	// Traduit par Fs_echo7, modifié par Caranud
   // UI
-  "QuickStackButton.hoverText": "Stacker rapidement dans les coffres à proximité",
+  "QuickStackButton.hoverText": "Empiler rapidement dans les coffres à proximité", // If this is translated, try to keep the string length as close to the original as possible.
+
+  "AutoOrganizeButton.hoverText": "Orga auto ON",
+  "AutoOrganizeButton.hoverText.disable": "(bouton droit pour désactiver)",
+  "AutoOrganizeButton.hoverText.disable-gamepad": "(bouton X pour désactiver)",
 
   // ModConfigMenu
-  "ModConfigMenu.Label.QuickStackToNearbyChests": "Stacker rapidement dans les coffres à proximité",
+  "ModConfigMenu.Label.QuickStackToNearbyChests": "Empiler rapidement dans les coffres à proximité",
 
-  "ModConfigMenu.IsEnableQuickStack.Name": "Activer le stackage rapide ?",
-  "ModConfigMenu.IsEnableQuickStack.Desc": "Si activé, ajoute un bouton \"Stacker rapidement dans les coffres à proximité\" à votre inventaire. En appuyant sur ce bouton, les objets de votre inventaire seront stackés dans les coffres à proximité contenant les mêmes objets.",
+  "ModConfigMenu.IsEnableQuickStack.Name": "Activer l’empilement rapide ?",
+  "ModConfigMenu.IsEnableQuickStack.Desc": "Si activé, ajoute un bouton \"Empiler rapidement dans les coffres à proximité\" à votre inventaire. En appuyant sur ce bouton, les objets de votre inventaire seront déplacés dans les coffres à proximité contenant les mêmes objets.",
 
   "ModConfigMenu.QuickStackRange.Name": "Portée",
-  "ModConfigMenu.QuickStackRange.Desc": "Combien de cases autour du joueur chercher pour trouver les coffres à proximité.",
+  "ModConfigMenu.QuickStackRange.Desc": "Combien de cases autour du joueur chercher pour trouver les coffres à proximité.\n\nSi paramétré sur \"Location\" (lieu), tous les coffres dans la même zone que le joueur seront pris en compte.\n\nSi paramétré sur \"Global\", tous les coffres du monde seront pris en compte.",
+  "ModConfigMenu.QuickStackRange.ChestsAnywhereGlobalWarning": "La portée configurée par le mod était \"Global\" mais a été réinitialisée sur \"Location\". \"Global\" est uniquement supporté si le mod Chests Anywhere est installé.",
 
   "ModConfigMenu.IsEnableQuickStackHotkey.Name": "Activer le raccourci clavier ?",
-  "ModConfigMenu.IsEnableQuickStackHotkey.Desc": "Si activé, en appuyant sur l'un des raccourcis clavier de stackage rapide spécifiés ci-dessous, vos objets seront stackés rapidement, même hors de votre inventaire.",
+  "ModConfigMenu.IsEnableQuickStackHotkey.Desc": "Si activé, en appuyant sur l'un des raccourcis clavier d’empilement rapide spécifiés ci-dessous, vos objets seront empilement rapidement, même hors de votre menu d’inventaire.",
 
   "ModConfigMenu.QuickStackKeyboardHotkey.Name": "Raccourci clavier",
-  "ModConfigMenu.QuickStackKeyboardHotkey.Desc": "Appuyez sur cette touche pour stacker rapidement vos objets.",
+  "ModConfigMenu.QuickStackKeyboardHotkey.Desc": "Appuyez sur cette touche pour empiler rapidement vos objets.",
 
   "ModConfigMenu.QuickStackControllerHotkey.Name": "Raccourci manette",
-  "ModConfigMenu.QuickStackControllerHotkey.Desc": "Appuyez sur ce bouton pour stacker rapidement vos objets.",
+  "ModConfigMenu.QuickStackControllerHotkey.Desc": "Appuyez sur ce bouton pour empiler rapidement vos objets.",
 
-  "ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Name": "Stacker dans les bâtiments ?",
-  "ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Desc": "Si activé, les bâtiments à proximité ayant des inventaires (comme les Moulins ou les Cabanes de Junimo) seront également vérifiés lors du stackage rapide.",
+  "ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Name": "Empiler dans les bâtiments ?",
+  "ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Desc": "Si activé, les bâtiments à proximité ayant des inventaires (comme les moulins ou les cabanes de Junimo) seront également vérifiés lors de l’empilement rapide.",
 
-  "ModConfigMenu.IsQuickStackOverflowItems.Name": "Stacker les objets en surplus ?",
-  "ModConfigMenu.IsQuickStackOverflowItems.Desc": "Si activé, le stackage rapide placera autant d'objets que possible dans les coffres contenant cet objet, plutôt qu'un seul stack.",
+  "ModConfigMenu.IsQuickStackIntoDressers.Name": "Empiler dans les armoires ?",
+  "ModConfigMenu.IsQuickStackIntoDressers.Desc": "(Nécessite l’activation de \"Empiler les objets en surplus\")\nSi activé, les armoires proches seront également vérifiés lors de l’empilement rapide.",
+
+  "ModConfigMenu.IsQuickStackOverflowItems.Name": "Empiler les objets en surplus ?",
+  "ModConfigMenu.IsQuickStackOverflowItems.Desc": "Si activé, l’empilement rapide placera autant d'objets que possible dans les coffres contenant cet objet, plutôt qu'en un seul tas.",
 
   "ModConfigMenu.IsQuickStackIgnoreItemQuality.Name": "Ignorer la qualité des objets ?",
   "ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc": "Si activé, le stackage rapide placera les objets dans les coffres contenant n'importe quelle qualité de cet objet.",
 
   "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Name": "Afficher les coffres à proximité ?",
   "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Desc": "Si activé, en survolant le bouton de stackage rapide, une prévisualisation de tous les coffres à proximité, triés par distance, sera affichée dans l'infobulle.",
+
+  "ModConfigMenu.IsEnableQuickStackAnimation.Name": "Activer l’animation d’empilement rapide ?",
+  "ModConfigMenu.IsEnableQuickStackAnimation.Desc": "Si activé, une animation sera jouée lorsque les objets seront transportés pour montrer visuellement où chaque objet est conservé.",
+
+  "ModConfigMenu.QuickStackAnimationItemSpeed.Name": "Animation : vitesse de déplacement",
+  "ModConfigMenu.QuickStackAnimationItemSpeed.Desc": "Pour l’animation d’empilement :\nAjuste la vitesse à laquelle les objets se déplacent vers\nle coffre.\n\n0.5x : vitesse réduite de moitié\n1x : vitesse normale\n3x : vitesse triplée",
+
+  "ModConfigMenu.QuickStackAnimationStackSpeed.Name": "Animation : vitesse d’empilement",
+  "ModConfigMenu.QuickStackAnimationStackSpeed.Desc": "Pour l’animation d’empilement :\nAjuste la vitesse à laquelle les objets sont empilés dans\nle coffre.\n\n0.5x : vitesse réduite de moitié\n1x : vitesse normale\n3x : vitesse triplée",
 
   "ModConfigMenu.Label.FavoriteItems": "Objets favoris",
 
@@ -54,6 +70,25 @@
 
   "ModConfigMenu.FavoriteItemsControllerHotkey.Name": "Raccourci manette",
   "ModConfigMenu.FavoriteItemsControllerHotkey.Desc": "Maintenez ce bouton enfoncé lors de la sélection d'un objet pour le marquer comme favori.",
+
+  "ModConfigMenu.Label.TakeAllButOne": "Tout prendre sauf 1",
+
+  "ModConfigMenu.IsEnableTakeAllButOne.Name": "Activer tout prendre sauf 1",
+  "ModConfigMenu.IsEnableTakeAllButOne.Desc": "Si activé, lorsque vous maintenez le raccourci ci-dessous, vous laisserez un objet du tas sélectionné plutôt que de prendre un objet à la fois",
+
+  "ModConfigMenu.TakeAllButOneKeyboardHotkey.Name": "Raccourci clavier",
+  "ModConfigMenu.TakeAllButOneKeyboardHotkey.Desc": "Maintenez cette touche enfoncée lors de la sélection d'un objet pour instantanément tout prendre du tas mais en laissant un objet.",
+
+  "ModConfigMenu.TakeAllButOneControllerHotkey.Name": "Raccourci manette",
+  "ModConfigMenu.TakeAllButOneControllerHotkey.Desc": "Maintenez cette touche enfoncée lors de la sélection d'un objet pour instantanément tout prendre du tas mais en laissant un objet.",
+
+  "ModConfigMenu.Label.AutoOrganizeChest": "Organisation automatique du coffre",
+
+  "ModConfigMenu.IsEnableAutoOrganizeChest.Name": "Permettre le bouton d’organisation automatique du coffre ?",
+  "ModConfigMenu.IsEnableAutoOrganizeChest.Desc": "Si activé, cliquer au bouton droit sur le bouton d’organisation du menu d’un coffre (ou appuyer sur X à la manette) activera/désactivera l’organisation automatique pour ce coffre. Lorsqu’un coffre a ce paramètre activé, tous les objets resteront organisés, même lorsque de nouveaux objets sont ajoutés.",
+
+  "ModConfigMenu.IsShowAutoOrganizeButtonInstructions.Name": "Montrer les instruction dans le texte de survol ?",
+  "ModConfigMenu.IsShowAutoOrganizeButtonInstructions.Desc": "Si activé, le texte au survol pour le bouton d’organisation automatique inclura une lignes supplémentaire expliquant comment désactiver ce paramètre.",
 
   "ModConfigMenu.Label.Miscellaneous": "Divers",
 
