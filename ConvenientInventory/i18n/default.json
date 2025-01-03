@@ -25,6 +25,9 @@
   "ModConfigMenu.QuickStackControllerHotkey.Name": "Keybind (controller)",
   "ModConfigMenu.QuickStackControllerHotkey.Desc": "Press this button to quick stack your items.",
 
+  "ModConfigMenu.IsIgnoreHoppers.Name": "Ignore Hoppers?",
+  "ModConfigMenu.IsIgnoreHoppers.Desc": "Don't add items into hoppers.\nUsed for mods that add an inventory to hoppers like Filtered Chest Hoppers",
+
   "ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Name": "Quick stack into buildings?",
   "ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Desc": "If enabled, nearby buildings with inventories (such as Mills or Junimo Huts) will be considered when quick stacking.",
 
