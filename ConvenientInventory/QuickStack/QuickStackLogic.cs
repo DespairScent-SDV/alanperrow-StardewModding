@@ -23,6 +23,11 @@ namespace ConvenientInventory.QuickStack
 
             List<TypedChest> chests = GetTypedChestsWithinRange(who, rangeStr, true);
 
+            if(ModEntry.Config.IsIgnoreHoppers)
+            {
+                chests = chests.Where(chest => chest.ChestType != ChestType.Hopper).ToList();
+            }
+
             Inventory playerInventory = who.Items;
 
             QuickStackAnimation quickStackAnimation = null;

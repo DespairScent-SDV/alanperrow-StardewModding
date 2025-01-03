@@ -10,6 +10,8 @@ namespace ConvenientInventory
 
         public string QuickStackRange { get; set; } = ConfigHelper.QuickStackRange_Default;
 
+        public bool IsIgnoreHoppers { get; set; } = true;
+
         public bool IsQuickStackIntoBuildingsWithInventories { get; set; } = true;
 
         public bool IsQuickStackIntoDressers { get; set; } = true;

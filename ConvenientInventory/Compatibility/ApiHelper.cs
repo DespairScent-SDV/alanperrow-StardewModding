@@ -89,6 +89,14 @@ namespace ConvenientInventory.Compatibility
 
             api.AddBoolOption(
                 mod: modManifest,
+                getValue: () => config.IsIgnoreHoppers,
+                setValue: value => config.IsIgnoreHoppers = value,
+                name: () => helper.Translation.Get("ModConfigMenu.IsIgnoreHoppers.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.IsIgnoreHoppers.Desc")
+            );
+
+            api.AddBoolOption(
+                mod: modManifest,
                 getValue: () => config.IsQuickStackIntoBuildingsWithInventories,
                 setValue: value => config.IsQuickStackIntoBuildingsWithInventories = value,
                 name: () => helper.Translation.Get("ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Name"),
